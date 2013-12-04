@@ -10,6 +10,7 @@ from asnsreceiver.signals import asns_message_received
 def verify_message(msg):
     try:
         cert_res = urllib2.urlopen(msg['SigningCertURL'])
+        signature = cert_res.read()
     except (urllib2.HTTPError, IOError):  # Can't open the URL
         return False
 
@@ -44,7 +45,7 @@ def verify_message(msg):
         message += 'Type\n'
         message += msg['Type'] + '\n'
 
-    cert = X509.load_cert_string(str(cert_res.read()))
+    cert = X509.load_cert_string(str(signature))
     pubkey = cert.get_pubkey()
     pubkey.reset_context(md='sha1')
     pubkey.verify_init()
